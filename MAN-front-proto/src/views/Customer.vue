@@ -46,7 +46,7 @@
             </v-col>
           </v-row>
           <!-- Bus Image -->
-          <v-row class="">
+          <!-- <v-row class="">
             <v-img width="500" class="wrapper" :src="`${img}`" alt="img">
               <svg
                 class="cam"
@@ -93,7 +93,7 @@
                 <rect width="29" height="29" rx="3" fill="#6887F5" />
               </svg>
             </v-img>
-          </v-row>
+          </v-row> -->
         </v-col>
 
         <!-- Main Group Dropdown -->
@@ -115,6 +115,7 @@
                 v-for="product in comModels"
                 :itemProps="itemProps"
                 v-model="selectedModel[product.name]"
+                :key="product.name"
                 :items="product.types"
                 :label="product.name"
                 dense
@@ -138,10 +139,107 @@
             Export
           </v-btn>
         </v-col>
+
         <v-col v-if="xportbool == true" class="text-right" cols="12">
           {{ xportdata }}
         </v-col>
       </v-row>
+    </div>
+
+    <div class="bus-layout">
+      <img
+        src="@/static/12C-2T.jpg"
+        alt="Bus Seating Chart"
+        class="seating-chart"
+      />
+
+      <!-- Camera icon overlays -->
+      <div
+        v-for="camera in cameras"
+        :key="camera.id"
+        class="camera-overlay"
+        :style="{ top: camera.top, left: camera.left }"
+      >
+        <div @click="activateCamera(camera.id)">
+          <img
+            v-if="activeCameraId === camera.id"
+            :src="getCameraImage(camera.direction)"
+            alt="Camera Direction"
+            class="camera-icon"
+          />
+          <img
+            v-else
+            src="@/assets/Camera/Polygon1Cone.svg"
+            alt="Inactive Camera"
+            class="camera-icon"
+          />
+        </div>
+      </div>
+
+      <!-- Directional buttons (displayed when a camera is active) -->
+
+      <div v-if="activeCameraId" class="direction-buttons">
+        <div class="direction-row top-row">
+          <button @click="changeDirection('up-left')" class="direction-button">
+            <img
+              :src="getImagePath('up-left')"
+              alt="Up-Left"
+              class="button-image"
+            />
+          </button>
+          <button @click="changeDirection('up')" class="direction-button">
+            <img :src="getImagePath('up')" alt="Up" class="button-image" />
+          </button>
+          <button @click="changeDirection('up-right')" class="direction-button">
+            <img
+              :src="getImagePath('up-right')"
+              alt="Up-Right"
+              class="button-image"
+            />
+          </button>
+        </div>
+        <div class="direction-row middle-row">
+          <button @click="changeDirection('left')" class="direction-button">
+            <img :src="getImagePath('left')" alt="Left" class="button-image" />
+          </button>
+          <div class="spacer"></div>
+          <!-- this is the spacer div -->
+          <button @click="changeDirection('right')" class="direction-button">
+            <img
+              :src="getImagePath('right')"
+              alt="Right"
+              class="button-image"
+            />
+          </button>
+        </div>
+        <div class="direction-row bottom-row">
+          <button
+            @click="changeDirection('down-left')"
+            class="direction-button"
+          >
+            <img
+              :src="getImagePath('down-left')"
+              alt="Down-Left"
+              class="button-image"
+            />
+          </button>
+          <button @click="changeDirection('down')" class="direction-button">
+            <img :src="getImagePath('down')" alt="Down" class="button-image" />
+          </button>
+          <button
+            @click="changeDirection('down-right')"
+            class="direction-button"
+          >
+            <img
+              :src="getImagePath('down-right')"
+              alt="Down-Right"
+              class="button-image"
+            />
+          </button>
+        </div>
+      </div>
+
+      <button class="reset-button" @click="resetCameras">Reset</button>
     </div>
   </v-container>
 </template>
@@ -165,6 +263,15 @@ export default {
 
   data() {
     return {
+      cameras: [
+        { id: 1, top: "20px", left: "50px", direction: "" },
+        { id: 2, top: "50px", left: "100px", direction: "" },
+        { id: 3, top: "100px", left: "500px", direction: "" },
+
+        // Add more cameras as needed
+      ],
+      activeCameraId: null,
+
       selectedType: null,
       selectedMainGroup: null,
       selectedGattung: null,
@@ -301,13 +408,30 @@ export default {
       };
     },
 
-    onMainGroupChange(value) {
-      // Main Group seçimi değiştiğinde tetiklenen işlemler
-      console.log("Selected Main Group: ", value);
-      if (value === "Camera") {
-        // Camera seçildiğinde yapılacak işlemler
-        // Örneğin, ek bir bileşeni göstermek veya gizlemek
+    activateCamera(cameraId) {
+      this.activeCameraId = cameraId;
+    },
+    changeDirection(direction) {
+      const camera = this.cameras.find((cam) => cam.id === this.activeCameraId);
+      if (camera) {
+        camera.direction = direction;
       }
+    },
+    getCameraImage(direction) {
+      if (direction) {
+        return require(`@/assets/DirectionImages/${direction}.png`);
+      }
+      return "@assets/Camera/Polygon1Cone.svg";
+    },
+    resetCameras() {
+      this.cameras.forEach((camera) => {
+        camera.direction = "";
+      });
+      // Optionally, clear the active camera as well
+      this.activeCameraId = null;
+    },
+    getImagePath(direction) {
+      return require(`@/assets/DirectionImages/${direction}.png`);
     },
   },
 };
@@ -342,5 +466,99 @@ export default {
   top: 66%;
   right: 89%;
   transform: rotate();
+}
+
+.bus-layout {
+  position: relative;
+  /* display: inline-block; Change as needed */
+}
+
+.seating-chart {
+  width: 100%; /* Adjust as needed to fit your layout */
+  height: auto;
+}
+
+.camera-overlay {
+  position: absolute;
+  cursor: pointer;
+  /* make sure the size is appropriate for the icons */
+  width: 30px; /* adjust as needed */
+  height: 30px; /* adjust as needed */
+}
+
+.camera-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.reset-button {
+  position: absolute;
+  bottom: 120px; /* Position the reset button appropriately */
+  right: 360px;
+  border: 3px solid grey;
+}
+
+.direction-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  bottom: 50px; /* Adjust as needed */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Center horizontally */
+}
+
+.direction-buttons button {
+  margin: 0 5px;
+}
+
+.direction-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  bottom: 50px; /* Adjust as needed */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Center horizontally */
+}
+
+.direction-row {
+  display: flex;
+  justify-content: center;
+}
+
+.direction-row button {
+  margin: 0 5px; /* Spacing between buttons */
+}
+.button-image {
+  width: 20px; /* Set the width as desired */
+  height: 20px; /* Set the height as desired */
+
+  /* If you want to keep the aspect ratio, set only one dimension */
+}
+
+.top-row button,
+.bottom-row button {
+  margin: 0 10px; /* Adjust as needed for spacing */
+}
+
+.middle-row {
+  margin: 10px 0; /* Adjust as needed for spacing between rows */
+}
+
+.direction-button {
+  background: none;
+  border: none;
+  padding: 5px; /* Adjust as needed for padding around the image */
+  cursor: pointer;
+}
+
+.spacer {
+  width: 40px; /* Equal to the width of your button to ensure even spacing */
+}
+
+.button-image {
+  width: 30px; /* Adjust as needed */
+  height: 30px; /* Adjust as needed */
 }
 </style>
