@@ -148,7 +148,7 @@
 
     <div class="bus-layout">
       <img
-        src="@/static/12C-2T.jpg"
+        src="@/assets/12C-2T.jpg"
         alt="Bus Seating Chart"
         class="seating-chart"
       />
@@ -169,7 +169,7 @@
           />
           <img
             v-else
-            src="@/assets/Camera/Polygon1Cone.svg"
+            src="@/assets/Camera/Cam.svg"
             alt="Inactive Camera"
             class="camera-icon"
           />
@@ -178,68 +178,27 @@
 
       <!-- Directional buttons (displayed when a camera is active) -->
 
-      <div v-if="activeCameraId" class="direction-buttons">
-        <div class="direction-row top-row">
-          <button @click="changeDirection('up-left')" class="direction-button">
-            <img
-              :src="getImagePath('up-left')"
-              alt="Up-Left"
-              class="button-image"
-            />
-          </button>
-          <button @click="changeDirection('up')" class="direction-button">
-            <img :src="getImagePath('up')" alt="Up" class="button-image" />
-          </button>
-          <button @click="changeDirection('up-right')" class="direction-button">
-            <img
-              :src="getImagePath('up-right')"
-              alt="Up-Right"
-              class="button-image"
-            />
-          </button>
+      <div v-if="activeCameraId" class="direction-button">
+        <div class="direction-row">
+          <button @click="changeDirection('up-left')">Up-Left</button>
+          <button @click="changeDirection('up')">Up</button>
+          <button @click="changeDirection('up-right')">Up-Right</button>
         </div>
-        <div class="direction-row middle-row">
-          <button @click="changeDirection('left')" class="direction-button">
-            <img :src="getImagePath('left')" alt="Left" class="button-image" />
-          </button>
-          <div class="spacer"></div>
-          <!-- this is the spacer div -->
-          <button @click="changeDirection('right')" class="direction-button">
-            <img
-              :src="getImagePath('right')"
-              alt="Right"
-              class="button-image"
-            />
-          </button>
+        <div class="direction-row">
+          <button @click="changeDirection('left')">Left</button>
+          <div></div>
+          <!-- empty div for spacing -->
+          <button @click="changeDirection('right')">Right</button>
         </div>
-        <div class="direction-row bottom-row">
-          <button
-            @click="changeDirection('down-left')"
-            class="direction-button"
-          >
-            <img
-              :src="getImagePath('down-left')"
-              alt="Down-Left"
-              class="button-image"
-            />
-          </button>
-          <button @click="changeDirection('down')" class="direction-button">
-            <img :src="getImagePath('down')" alt="Down" class="button-image" />
-          </button>
-          <button
-            @click="changeDirection('down-right')"
-            class="direction-button"
-          >
-            <img
-              :src="getImagePath('down-right')"
-              alt="Down-Right"
-              class="button-image"
-            />
-          </button>
+        <div class="direction-row">
+          <button @click="changeDirection('down-left')">Down-Left</button>
+          <button @click="changeDirection('down')">Down</button>
+          <button @click="changeDirection('down-right')">Down-Right</button>
         </div>
       </div>
-
-      <button class="reset-button" @click="resetCameras">Reset</button>
+      <div class="direction-row">
+        <button class="reset-button" @click="resetCameras">Reset</button>
+      </div>
     </div>
   </v-container>
 </template>
@@ -264,9 +223,11 @@ export default {
   data() {
     return {
       cameras: [
-        { id: 1, top: "20px", left: "50px", direction: "" },
-        { id: 2, top: "50px", left: "100px", direction: "" },
-        { id: 3, top: "100px", left: "500px", direction: "" },
+        { id: 1, top: "230px", left: "75px", direction: "" },
+        { id: 2, top: "90px", left: "150px", direction: "" },
+        { id: 3, top: "90px", left: "550px", direction: "" },
+        { id: 4, top: "90px", left: "790px", direction: "" },
+        { id: 5, top: "130px", left: "930px", direction: "" },
 
         // Add more cameras as needed
       ],
@@ -419,15 +380,16 @@ export default {
     },
     getCameraImage(direction) {
       if (direction) {
+        // You must ensure the path is correctly interpreted by webpack
         return require(`@/assets/DirectionImages/${direction}.png`);
       }
-      return "@assets/Camera/Polygon1Cone.svg";
+      // return "@/assets/Camera/Polygon1Cone.svg"; // Default camera image path
+      return "@/assets/Camera/Ellipse1Cam.svg"; // Default camera image path
     },
     resetCameras() {
       this.cameras.forEach((camera) => {
         camera.direction = "";
       });
-      // Optionally, clear the active camera as well
       this.activeCameraId = null;
     },
     getImagePath(direction) {
@@ -470,7 +432,9 @@ export default {
 
 .bus-layout {
   position: relative;
-  /* display: inline-block; Change as needed */
+  display: block; /* Or `flex`, `grid` etc. depending on your layout */
+  max-width: 1000px; /* Maximum width of the bus layout image */
+  margin: 0 auto; /* Center the layout if the view is larger than max-width */
 }
 
 .seating-chart {
@@ -482,8 +446,8 @@ export default {
   position: absolute;
   cursor: pointer;
   /* make sure the size is appropriate for the icons */
-  width: 30px; /* adjust as needed */
-  height: 30px; /* adjust as needed */
+  top: 5%; /* Adjust as needed */
+  left: 10%; /* Adjust as needed */
 }
 
 .camera-icon {
@@ -493,9 +457,10 @@ export default {
 
 .reset-button {
   position: absolute;
-  bottom: 120px; /* Position the reset button appropriately */
-  right: 360px;
-  border: 3px solid grey;
+  top: 170px;
+  right: 480px;
+  border: 2px solid grey;
+  z-index: 1000;
 }
 
 .direction-buttons {
