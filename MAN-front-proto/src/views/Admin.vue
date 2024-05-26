@@ -88,7 +88,7 @@
               <template v-slot:default="{ isActive }">
                 <v-card title="Delete A Main Group">
                   <v-card class="ma-3" v-for="groups in mainGroups">
-                    {{ groups }}
+                    {{ groups.name }}
 
                     <v-btn size="x-small" icon class="ml-5" color="red"
                       ><v-icon>mdi-delete</v-icon></v-btn
@@ -146,9 +146,15 @@
           ></v-card-title>
           <v-card-text>
             <v-select
+              :itemProps="itemProps"
+              v-model="selectedMainGroup"
               :items="mainGroups"
-              v-model="selectedGroup"
-              label="Select an option"
+              label="Main Group"
+              dense
+              solo
+              outlined
+              hide-details
+              @change="onMainGroupChange"
             ></v-select>
           </v-card-text>
         </v-card>
@@ -250,7 +256,7 @@
                 <v-card title="Edit A Gattung">
                   <v-select
                     :itemProps="itemProps"
-                    :items="gattungs"
+                    :items="filteredGattungs"
                     v-model="selectedGattung"
                     label="Select an option"
                   ></v-select>
@@ -275,10 +281,18 @@
           <v-card-text>
             <v-select
               :itemProps="itemProps"
-              :items="gattungs"
+              :items="filteredGattungs"
               v-model="selectedGattung"
-              label="Select an option"
-            ></v-select>
+              label="Gattung"
+              :disabled="!selectedMainGroup || !filteredGattungs.length"
+              item-text="name"
+              item-value="value"
+              dense
+              solo
+              outlined
+              hide-details
+            >
+            </v-select>
           </v-card-text>
         </v-card>
       </v-col>
@@ -291,63 +305,98 @@
         <v-card class="custom-part">
           <v-card-title>Custom Part</v-card-title>
           <v-card-text>
-            <v-radio-group v-model="selectedPart">
-              <v-row v-for="(part, index) in customParts" :key="index">
-                <v-col>
-                  <v-radio :label="part.name" :value="part.color"></v-radio>
-                </v-col>
-                <v-col>
-                  <v-chip :color="part.color" dark>{{ part.name }}</v-chip>
-                </v-col>
-                <v-col>
-                  <v-btn icon @click="addItem(index)">
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
-                  <v-btn icon @click="deleteItem(index)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
-                  <v-btn icon @click="editItem(index)">
-                    <v-icon>mdi-pencil</v-icon>
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-radio-group>
+            <v-select
+              v-for="product in comModels"
+              :itemProps="itemProps"
+              v-model="selectedModel[product.name]"
+              :key="product.id"
+              :items="product.types"
+              :label="product.name"
+              dense
+              solo
+              outlined
+              hide-details
+              class="ma-2"
+            >
+            </v-select>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
-
 <script>
 export default {
+  computed: {
+    comModels: function () {
+      for (let i = 0; i < this.products.length; i++) {
+        if (this.products[i].name == this.selectedMainGroup) {
+          return this.products[i].subProducts;
+        }
+      }
+      return "nothing";
+    },
+
+    filteredGattungs() {
+      if (this.selectedMainGroup) {
+        return this.gattungs.filter(
+          (gattung) => gattung.value === this.selectedMainGroup
+        );
+      }
+      return [];
+    },
+  },
+
   data() {
     return {
-      dialog: false,
-      search: "",
-
-      customParts: [
-        { name: "Red", color: "red" },
-        { name: "Green", color: "green" },
-        { name: "Blue", color: "blue" },
-      ],
-      selectedPart: null,
+      selectedType: null,
+      selectedMainGroup: null,
       selectedGattung: null,
-      selectedGroup: null,
-      addGroup: null,
-      addGattung: null,
-      addPart: null,
+      selectedModel: {},
+      xportdata: {},
+      xportbool: false,
+      dialog: false,
+      cameraRotations: {
+        cam1: 0,
+        cam2: 0,
+        cam3: 0,
+      },
+      types: [
+        { name: "12C-2T", value: "12C-2T" },
+        { name: "18C-3T", value: "18C-3T" },
+        { name: "19C-4T", value: "19C-4T" },
 
-      mainGroups: [
-        "Camera",
-        "528M (Rear Target Display)",
-        "Sondernutzungsfläche gegenüber Tür 2",
-        "Sondernutzungsfläche rechts vor Tür 2",
-        "Bestuhlung",
-        "Haltestangen",
-        "Abschrankung/Haarnadelstange an Tür 1",
+        // Daha fazla type öğesi...
       ],
-
+      mainGroups: [
+        //{ name: "Chair Type", value: "Chair Type" },
+        //{ name: "Chair Color", value: "Chair Color" },
+        { name: "Camera", value: "Camera" },
+        {
+          name: "528M (Rear Target Display)",
+          value: "528M (Rear Target Display)",
+        },
+        {
+          name: "Sondernutzungsfläche gegenüber Tür 2", // Kapı 2'nin karşısındaki özel kullanım alanı
+          value: "Sondernutzungsfläche gegenüber Tür 2",
+        },
+        {
+          name: "Sondernutzungsfläche rechts vor Tür 2", // Kapı 2'nin önünde sağda özel kullanım alanı
+          value: "Sondernutzungsfläche rechts vor Tür 2",
+        },
+        {
+          name: "Bestuhlung", //Koltuklar
+          value: "Bestuhlung",
+        },
+        {
+          name: "Haltestangen", //Tutunma rayları
+          value: "Haltestangen",
+        },
+        {
+          name: "Abschrankung/Haarnadelstange an Tür 1", //Kapı 1'de bariyer / saç tokası çubuğu
+          value: "Abschrankung/Haarnadelstange an Tür 1",
+        },
+      ],
       gattungs: [
         {
           name: "680A - SNF gegenüber Tür 2", // Sondernutzungsfläche gegenüber Tür 2'nin gattungu //1
@@ -382,12 +431,187 @@ export default {
           value: "Abschrankung/Haarnadelstange an Tür 1", // 65LD - Kapı 1'de bölme
         },
       ],
+      products: [
+        {
+          name: "Camera",
+          subProducts: [
+            {
+              name: "Type",
+              types: [
+                {
+                  name: "CAM A",
+                  value: "A",
+                },
+                {
+                  name: "CAM B",
+                  value: "B",
+                },
+              ],
+            },
+            {
+              name: "Recorder",
+              types: [
+                {
+                  name: "Yes",
+                  value: 1,
+                },
+                {
+                  name: "No",
+                  value: 0,
+                },
+              ],
+            },
+            {
+              name: "Lenght",
+              types: [
+                {
+                  name: "1 Hour",
+                  value: "1 Hour",
+                },
+                {
+                  name: "2 Hour",
+                  value: "2 Hour",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          name: "Chair Type",
+          subProducts: [
+            {
+              name: "ChairModel",
+              types: [
+                {
+                  name: "Chair A",
+                  value: "A",
+                },
+                {
+                  name: "Chair B",
+                  value: "B",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          name: "Chair Color",
+          subProducts: [
+            {
+              name: "Color",
+              types: [
+                {
+                  name: "Red",
+                  value: "Red",
+                },
+                {
+                  name: "Blue",
+                  value: "Blue",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          name: "528M (Rear Target Display)",
+          subProducts: [
+            {
+              name: "Model",
+              types: [
+                {
+                  name: "(NONE)",
+                  value: "(NONE)",
+                },
+                {
+                  name: "BUSTEC",
+                  value: "BUSTEC",
+                },
+                {
+                  name: "MODEL X",
+                  value: "MODEL X",
+                },
+              ],
+            },
+
+            {
+              name: "Size",
+              types: [
+                {
+                  name: "(NONE)",
+                  value: "(NONE)",
+                },
+                {
+                  name: "19x160",
+                  value: "19x160",
+                },
+                {
+                  name: "19x120",
+                  value: "19x120",
+                },
+              ],
+            },
+            {
+              name: "Led Color",
+              types: [
+                {
+                  name: "(NONE)",
+                  value: "(NONE)",
+                },
+                {
+                  name: "Amber",
+                  value: "Amber",
+                },
+                {
+                  name: "Weiss",
+                  value: "Weiss",
+                },
+                {
+                  name: "RGB",
+                  value: "RGB",
+                },
+              ],
+            },
+            {
+              name: "Rearmost",
+              types: [
+                {
+                  name: "Yes",
+                  value: 1,
+                },
+                {
+                  name: "No",
+                  value: 0,
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: "Sondernutzungsfläche gegenüber Tür 2",
+        },
+        {
+          name: "Sondernutzungsfläche rechts vor Tür 2",
+        },
+        {
+          name: "Bestuhlung",
+        },
+        {
+          name: "Haltestangen",
+        },
+        {
+          name: "Abschrankung/Haarnadelstange an Tür 1",
+        },
+      ],
     };
   },
-
+  // ... methods, etc.
   methods: {
-    clicked() {
-      console.log(this.gattungs);
+    rotateCamera(cameraId) {
+      this.cameraRotations[cameraId] += 45; // Her tıklamada 45 derece döndür
+      console.log(this.rotation);
     },
 
     itemProps(item) {
@@ -395,6 +619,19 @@ export default {
         title: item.name,
         value: item.value,
       };
+    },
+    //gattung name and mainGroup
+    gattungProps(item) {
+      return {
+        title: item.name,
+        value: item.mainGroup,
+      };
+    },
+
+    onMainGroupChange() {
+      this.selectedGattung = null;
+      // Eğer filteredGattungs computed property'si reaktif değilse, bu metodda manuel olarak tetikleyebilirsiniz.
+      this.filteredGattungs; // Bu satır computed property'yi manuel olarak tetiklemek için kullanılabilir.
     },
   },
 };
