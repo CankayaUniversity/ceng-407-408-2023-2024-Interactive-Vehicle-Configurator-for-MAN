@@ -280,20 +280,19 @@
           </v-card-title>
           <v-card-text>
             <v-select
-              :itemProps="itemProps"
+              :itemProps="gattungProps"
               :items="filteredGattungs"
               v-model="selectedGattung"
               label="Gattung"
               :disabled="!selectedMainGroup || !filteredGattungs.length"
               item-text="name"
-              item-value="value"
+              item-value="name"
               dense
               solo
               outlined
               hide-details
             >
             </v-select>
-            {{ selectedGattung }}
           </v-card-text>
         </v-card>
       </v-col>
@@ -379,6 +378,12 @@
 </template>
 <script>
 export default {
+  watch: {
+    selectedMainGroup() {
+      this.onMainGroupChange();
+    },
+  },
+
   computed: {
     comModels: function () {
       for (let i = 0; i < this.products.length; i++) {
@@ -661,7 +666,7 @@ export default {
     gattungProps(item) {
       return {
         title: item.name,
-        value: item.mainGroup,
+        value: item.name,
       };
     },
 
