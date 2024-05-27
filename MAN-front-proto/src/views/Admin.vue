@@ -293,6 +293,7 @@
               hide-details
             >
             </v-select>
+            {{ selectedGattung }}
           </v-card-text>
         </v-card>
       </v-col>
@@ -394,17 +395,18 @@ export default {
           (gattung) => gattung.value === this.selectedMainGroup
         );
       }
+
       return [];
     },
   },
 
   data() {
     return {
-      selectedMainGroup: null,
-      selectedGattung: null,
+      selectedMainGroup: "",
+      selectedGattung: "",
       selectedModel: {},
-      addMainGroup: null,
-      addGattung: null,
+      addMainGroup: "",
+      addGattung: "",
       addModel: {},
       dialog: false,
 
@@ -649,11 +651,6 @@ export default {
   },
   // ... methods, etc.
   methods: {
-    rotateCamera(cameraId) {
-      this.cameraRotations[cameraId] += 45; // Her tıklamada 45 derece döndür
-      console.log(this.rotation);
-    },
-
     itemProps(item) {
       return {
         title: item.name,
