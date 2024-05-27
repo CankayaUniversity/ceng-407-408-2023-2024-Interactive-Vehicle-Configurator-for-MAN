@@ -293,6 +293,7 @@
               hide-details
             >
             </v-select>
+            {{ selectedGattung }}
           </v-card-text>
         </v-card>
       </v-col>
@@ -342,7 +343,7 @@
               </template> </v-dialog
           ></v-card-title>
 
-          <v-card-text v-for="product in comModels">
+          <v-card-text v-for="product in comModels" v-if="selectedGattung">
             <v-row>
               <v-col>
                 <v-select
@@ -387,10 +388,14 @@ export default {
   computed: {
     comModels: function () {
       for (let i = 0; i < this.products.length; i++) {
-        if (this.products[i].name == this.selectedMainGroup) {
+        if (
+          this.products[i].gattungName == this.selectedGattung ||
+          this.products[i].gattungName == this.selectedMainGroup
+        ) {
           return this.products[i].subProducts;
         }
       }
+
       return "nothing";
     },
 
@@ -480,176 +485,112 @@ export default {
       ],
       products: [
         {
-          name: "Camera",
+          gattungName: "680A - SNF gegenüber Tür 2",
           subProducts: [
             {
-              name: "Type",
-              types: [
-                {
-                  name: "CAM A",
-                  value: "A",
-                },
-                {
-                  name: "CAM B",
-                  value: "B",
-                },
-              ],
+              name: "Geeignet für E-Scooter.Mit E Scooter Piktogramm",
             },
             {
-              name: "Recorder",
-              types: [
-                {
-                  name: "Yes",
-                  value: 1,
-                },
-                {
-                  name: "No",
-                  value: 0,
-                },
-              ],
+              name: "Verbau eines verkürsten Motorpodestes mit Ablagekasten",
             },
             {
-              name: "Lenght",
-              types: [
-                {
-                  name: "1 Hour",
-                  value: "1 Hour",
-                },
-                {
-                  name: "2 Hour",
-                  value: "2 Hour",
-                },
-              ],
+              name: "Geeignet für E-Scooter Verbau eines verkürsten Motorpodestes",
             },
           ],
         },
 
         {
-          name: "Chair Type",
+          gattungName: "680D - Anlehnplatte/Klappsitze vor SNF gegenüber Tür 2",
           subProducts: [
             {
-              name: "ChairModel",
-              types: [
-                {
-                  name: "Chair A",
-                  value: "A",
-                },
-                {
-                  name: "Chair B",
-                  value: "B",
-                },
-              ],
+              name: "Armlehne mit halter ohne Schloss",
+            },
+            {
+              name: "mit klappbarer Armlehne auf dem Bügel",
+            },
+            {
+              name: "Ausführing Trennwand mit Glasscheibe",
+            },
+            {
+              name: "Bügel E-Scooter tauglich ausführen",
             },
           ],
         },
 
         {
-          name: "Chair Color",
+          gattungName: "681D - Anlehnplatte/Klappsitze vor SNF vor Tür 2",
           subProducts: [
             {
-              name: "Color",
-              types: [
-                {
-                  name: "Red",
-                  value: "Red",
-                },
-                {
-                  name: "Blue",
-                  value: "Blue",
-                },
-              ],
+              name: "Armlehne mit halter",
+            },
+            {
+              name: "mit klappbarer Armlehne auf dem Bügel",
+            },
+            {
+              name: "Ausführing Trennwand mit Glasscheibe",
             },
           ],
         },
 
         {
-          name: "528M (Rear Target Display)",
+          gattungName: "704A - Bestuhlung",
           subProducts: [
             {
-              name: "Model",
-              types: [
-                {
-                  name: "(NONE)",
-                  value: "(NONE)",
-                },
-                {
-                  name: "BUSTEC",
-                  value: "BUSTEC",
-                },
-                {
-                  name: "MODEL X",
-                  value: "MODEL X",
-                },
-              ],
+              name: "mit Schaum Sitzpolster",
             },
+            {
+              name: "mit Schaum Mückenpolster",
+            },
+            {
+              name: "Alle Sitze Ohne Logo/Branding",
+            },
+            {
+              name: "STER 8 MS",
+            },
+          ],
+        },
 
+        {
+          gattungName: "700B - Farbe-Fahrgastsitzgestell",
+          subProducts: [
             {
-              name: "Size",
-              types: [
-                {
-                  name: "(NONE)",
-                  value: "(NONE)",
-                },
-                {
-                  name: "19x160",
-                  value: "19x160",
-                },
-                {
-                  name: "19x120",
-                  value: "19x120",
-                },
-              ],
-            },
-            {
-              name: "Led Color",
-              types: [
-                {
-                  name: "(NONE)",
-                  value: "(NONE)",
-                },
-                {
-                  name: "Amber",
-                  value: "Amber",
-                },
-                {
-                  name: "Weiss",
-                  value: "Weiss",
-                },
-                {
-                  name: "RGB",
-                  value: "RGB",
-                },
-              ],
-            },
-            {
-              name: "Rearmost",
-              types: [
-                {
-                  name: "Yes",
-                  value: 1,
-                },
-                {
-                  name: "No",
-                  value: 0,
-                },
-              ],
+              name: "Fahrgastsitzgestell RAL 7037",
             },
           ],
         },
         {
-          name: "Sondernutzungsfläche gegenüber Tür 2",
+          gattungName: "78RI - Sitzhaltegriffe",
+          subProducts: [
+            {
+              name: "Topcloser in RAL 1023 verkehrsgelb",
+            },
+            {
+              name: "Topcloser in RAL 7037 verkehrsgelb",
+            },
+            {
+              name: "Topcloser in RAL 1023 verkehrsgelb für EM sitz",
+            },
+          ],
         },
         {
-          name: "Sondernutzungsfläche rechts vor Tür 2",
+          gattungName: "65A6 - Farbe der Haltestangen und Trennwände",
+          subProducts: [
+            {
+              name: "Nur Knoten in",
+            },
+            {
+              name: "Nur Deckenhaltestangen in",
+            },
+          ],
         },
+
         {
-          name: "Bestuhlung",
-        },
-        {
-          name: "Haltestangen",
-        },
-        {
-          name: "Abschrankung/Haarnadelstange an Tür 1",
+          gattungName: "65LD - Abschrankung an Tür 1",
+          subProducts: [
+            {
+              name: "zusätzlich Teleskopabschrankung an Tür 1",
+            },
+          ],
         },
       ],
     };
