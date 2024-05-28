@@ -592,6 +592,18 @@ export default {
             },
           ],
         },
+
+        {
+          gattungName: "65A6 - Farbe der Haltestangen und Trennwände",
+          subProducts: [
+            {
+              name: "Nur Knoten in",
+            },
+            {
+              name: "Nur Deckenhaltestangen in",
+            },
+          ],
+        },
       ],
     };
   },
