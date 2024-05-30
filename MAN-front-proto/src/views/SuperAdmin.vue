@@ -66,7 +66,7 @@ export default {
     return {
       requests: [],
       dialog: false,
-      actionType: '',
+      actionType: "",
       requestId: null,
     };
   },
@@ -91,9 +91,9 @@ export default {
     },
     async executeAction() {
       this.dialog = false;
-      if (this.actionType === 'approve') {
+      if (this.actionType === "approve") {
         await this.approveRequest(this.requestId);
-      } else if (this.actionType === 'deny') {
+      } else if (this.actionType === "deny") {
         await this.denyRequest(this.requestId);
       }
     },
@@ -104,7 +104,9 @@ export default {
         );
         if (response.status === 200) {
           alert("Request approved successfully");
-          this.fetchRequests(); // Refresh the list
+          this.requests = this.requests.filter(
+            (request) => request.RequestID !== requestID
+          ); // Remove the approved request from the list
         } else {
           alert("Failed to approve request");
         }
@@ -116,7 +118,7 @@ export default {
     async denyRequest(requestID) {
       try {
         const response = await axios.post(
-          `http://localhost:3000/denyRequest/${requestID}`,
+          `http://localhost:3000/denyRequest/${requestID}`
         );
         if (response.status === 200) {
           alert("Request denied and removed successfully");
