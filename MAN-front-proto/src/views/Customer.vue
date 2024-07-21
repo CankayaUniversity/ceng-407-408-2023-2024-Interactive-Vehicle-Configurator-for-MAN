@@ -1429,11 +1429,30 @@
                   position: 'absolute',
                   top: detail.position.top,
                   left: detail.position.left,
-                  color: detail.color || 'red',
-                  fontSize: '20px',
                 }"
               >
-                {{ detail.text }}
+                <template v-if="detail.icon">
+                  <svg
+                    :style="{ transform: `rotate(${detail.rotation}deg)` }"
+                    width="30"
+                    height="20"
+                    viewBox="0 0 48 29"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M19 14.5L40.75 1.94263V27.0574L19 14.5Z"
+                      fill="#6887F5"
+                    />
+                    <rect width="29" height="29" rx="3" fill="#6887F5" />
+                  </svg>
+                </template>
+                <template v-else>
+                  <span
+                    :style="{ color: detail.color || 'red', fontSize: '20px' }"
+                    >{{ detail.text }}</span
+                  >
+                </template>
               </div>
             </v-img>
           </v-card-text>
@@ -2321,10 +2340,13 @@ export default {
         // Update imgSrc based on selected Type
         if (this.selectedType?.Name === "L4C") {
           this.imgSrc = "../src/static/12C-2T.jpg";
+          this.addCameraIcons("2T");
         } else if (this.selectedType?.Name === "LE") {
           this.imgSrc = "../src/static/18C-3T.jpg";
+          this.addCameraIcons("3T");
         } else if (this.selectedType?.Name === "Intercity") {
           this.imgSrc = "../src/static/19C-4T.jpg";
+          this.addCameraIcons("4T");
         }
       } else if (
         this.selectedMainGroup.Name === "Sondernutzungsfläche rechts vor Tür 2"
@@ -2395,7 +2417,44 @@ export default {
       this.showDetailsDialog = true;
       console.log("Dialog should now be open"); // Debug log
     },
+    addCameraIcons(suffix) {
+      for (let i = 1; i <= 6; i++) {
+        const cameraKey = `cam${i}_${suffix}`;
+        if (this.cameraRotations[cameraKey] !== undefined) {
+          this.accumulatedDetails.push({
+            icon: true,
+            position: this.getCameraPosition(cameraKey),
+            rotation: (this.cameraRotations[cameraKey] + 360) % 360,
+          });
+        }
+      }
+    },
 
+    getCameraPosition(cameraKey) {
+      const positions = {
+        cam1_2T: { top: "35%", left: "90%" },
+        cam2_2T: { top: "25%", left: "79%" },
+        cam3_2T: { top: "25%", left: "55%" },
+        cam4_2T: { top: "25%", left: "15%" },
+        cam5_2T: { top: "70%", left: "8%" },
+
+        cam1_3T: { top: "45%", left: "95%" },
+        cam2_3T: { top: "25%", left: "85%" },
+        cam3_3T: { top: "25%", left: "65%" },
+        cam4_3T: { top: "70%", left: "50%" },
+        cam5_3T: { top: "25%", left: "30%" },
+        cam6_3T: { top: "70%", left: "5%" },
+
+        cam1_4T: { top: "45%", left: "95%" },
+        cam2_4T: { top: "25%", left: "85%" },
+        cam3_4T: { top: "25%", left: "62%" },
+        cam4_4T: { top: "70%", left: "50%" },
+        cam5_4T: { top: "25%", left: "30%" },
+        cam6_4T: { top: "25%", left: "16%" },
+      };
+
+      return positions[cameraKey] || { top: "0%", left: "0%" };
+    },
     async downloadDetailsImage() {
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
